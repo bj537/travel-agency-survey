@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Survey Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Add SheetJS library -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- Add html2pdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --border-color: #e0e0e0;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --text-light: #7f8c8d;
+            --card-background: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .responses-table {
+            width: 100%;
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .responses-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .responses-table th,
+        .responses-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .responses-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        .responses-table tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-background);
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #ecf0f1;
+                --secondary-color: #bdc3c7;
+                --accent-color: #3498db;
+                --border-color: #34495e;
+                --background-color: #2c3e50;
+                --text-color: #ecf0f1;
+                --text-light: #bdc3c7;
+                --card-background: #34495e;
+            }
+
+            .header {
+                background-color: #1a252f;
+            }
+
+            .responses-table th {
+                background-color: #1a252f;
+            }
+
+            .filter-group select,
+            .filter-group input {
+                background-color: #2c3e50;
+                color: var(--text-color);
+                border-color: var(--border-color);
+            }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .export-options {
+                flex-direction: column;
+            }
+
+            .responses-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Admin Dashboard - Survey Analytics</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="dashboard">
+            <!-- Summary Section -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Submissions</h3>
+                    <div class="value" id="totalResponses">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Staff Responses</h3>
+                    <div class="value" id="staffResponses">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Manager Responses</h3>
+                    <div class="value" id="managerResponses">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Satisfaction</h3>
+                    <div class="value" id="avgSatisfaction">0%</div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label for="dateFilter">Date Range:</label>
+                    <select id="dateFilter" onchange="applyFilters()">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="roleFilter">Role:</label>
+                    <select id="roleFilter" onchange="applyFilters()">
+                        <option value="all">All Roles</option>
+                        <option value="staff">Staff Only</option>
+                        <option value="manager">Managers Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="export-options">
+                <button class="btn-success" onclick="exportToExcel()">Export to Excel</button>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Part 2 - Operational Efficiency</h3>
+                    <canvas id="part2Chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Part 3 - Excel Automation</h3>
+                    <canvas id="part3Chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Part 4 - Satisfaction</h3>
+                    <canvas id="part4Chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Part 5 - Intervention Needs</h3>
+                    <canvas id="part5Chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Responses Table -->
+            <div class="responses-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Agency</th>
+                            <th>Role</th>
+                            <th>Operational Method</th>
+                            <th>Avg. Satisfaction</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="responsesTableBody">
+                        <!-- Table content will be populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load and process survey data
+        function loadDashboard() {
+            const savedSurveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+            updateStatistics(savedSurveys);
+            updateCharts(savedSurveys);
+            updateResponsesTable(savedSurveys);
+        }
+
+        // Update statistics
+        function updateStatistics(surveys) {
+            const total = surveys.length;
+            const staff = surveys.filter(s => s.data.role === 'staff').length;
+            const managers = surveys.filter(s => s.data.role === 'manager').length;
+            
+            // Calculate average satisfaction (assuming 4 is max score)
+            const avgSatisfaction = surveys.reduce((acc, survey) => {
+                const scores = Object.entries(survey.data)
+                    .filter(([key, value]) => key.startsWith('staff_') || key.startsWith('man_'))
+                    .map(([_, value]) => parseInt(value) || 0);
+                return acc + (scores.reduce((a, b) => a + b, 0) / scores.length);
+            }, 0) / total;
+
+            // Update the statistics cards with filtered data
+            document.getElementById('totalResponses').textContent = total;
+            document.getElementById('staffResponses').textContent = staff;
+            document.getElementById('managerResponses').textContent = managers;
+            document.getElementById('avgSatisfaction').textContent = 
+                total ? `${((avgSatisfaction / 4) * 100).toFixed(1)}%` : '0%';
+
+            // Update the statistics cards' titles to reflect the current filter
+            const roleFilter = document.getElementById('roleFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            let filterText = '';
+            if (roleFilter !== 'all') {
+                filterText += `${roleFilter.charAt(0).toUpperCase() + roleFilter.slice(1)} `;
+            }
+            if (dateFilter !== 'all') {
+                filterText += `${dateFilter.charAt(0).toUpperCase() + dateFilter.slice(1)} `;
+            }
+
+            if (filterText) {
+                document.querySelectorAll('.stat-card h3').forEach(header => {
+                    const baseTitle = header.textContent.split(' (')[0];
+                    header.textContent = `${baseTitle} (${filterText.trim()})`;
+                });
+            } else {
+                // Reset to default titles if no filters are applied
+                document.querySelectorAll('.stat-card h3').forEach(header => {
+                    const baseTitle = header.textContent.split(' (')[0];
+                    header.textContent = baseTitle;
+                });
+            }
+        }
+
+        // Update charts
+        function updateCharts(surveys) {
+            // Part 2 - Operational Efficiency Chart
+            const part2Data = {
+                time: calculatePartRatings(surveys, ['time']),
+                accuracy: calculatePartRatings(surveys, ['accuracy']),
+                errors: calculatePartRatings(surveys, ['errors']),
+                prod: calculatePartRatings(surveys, ['prod'])
+            };
+            createPartChart('part2Chart', 'Operational Efficiency', part2Data);
+
+            // Part 3 - Excel Automation Chart
+            const part3Data = {
+                eff: calculatePartRatings(surveys, ['eff']),
+                exacc: calculatePartRatings(surveys, ['exacc']),
+                extime: calculatePartRatings(surveys, ['extime'])
+            };
+            createPartChart('part3Chart', 'Excel Automation Impact', part3Data);
+
+            // Part 4 - Satisfaction Chart
+            const part4Data = {
+                staff: calculatePartRatings(surveys, ['staff']),
+                manager: calculatePartRatings(surveys, ['man'])
+            };
+            createPartChart('part4Chart', 'Role-based Satisfaction', part4Data);
+
+            // Part 5 - Intervention Chart
+            const part5Data = {
+                intervention: calculatePartRatings(surveys, ['int'])
+            };
+            createPartChart('part5Chart', 'Intervention Needs', part5Data);
+        }
+
+        // Calculate ratings for a specific part
+        function calculatePartRatings(surveys, prefixes) {
+            const ratings = { '1': 0, '2': 0, '3': 0, '4': 0 };
+            const total = surveys.length;
+
+            surveys.forEach(survey => {
+                prefixes.forEach(prefix => {
+                    const value = survey.data[`${prefix}_1`];
+                    if (value) ratings[value]++;
+                });
+            });
+
+            return {
+                labels: ['Strongly Disagree', 'Disagree', 'Agree', 'Strongly Agree'],
+                data: [ratings['1'], ratings['2'], ratings['3'], ratings['4']],
+                total: total
+            };
+        }
+
+        // Create part-specific chart
+        function createPartChart(canvasId, title, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            // Define consistent colors for each rating level
+            const ratingColors = {
+                'Strongly Disagree': {
+                    background: 'rgba(231, 76, 60, 0.8)',   // Red
+                    border: 'rgb(231, 76, 60)'
+                },
+                'Disagree': {
+                    background: 'rgba(241, 196, 15, 0.8)',  // Yellow
+                    border: 'rgb(241, 196, 15)'
+                },
+                'Agree': {
+                    background: 'rgba(52, 152, 219, 0.8)',  // Blue
+                    border: 'rgb(52, 152, 219)'
+                },
+                'Strongly Agree': {
+                    background: 'rgba(46, 204, 113, 0.8)',  // Green
+                    border: 'rgb(46, 204, 113)'
+                }
+            };
+
+            // Aggregate data by rating level
+            const ratingData = {
+                'Strongly Disagree': 0,
+                'Disagree': 0,
+                'Agree': 0,
+                'Strongly Agree': 0
+            };
+            let totalResponses = 0;
+
+            // Process each category and aggregate by rating
+            Object.entries(data).forEach(([category, categoryData]) => {
+                categoryData.data.forEach((value, index) => {
+                    const rating = categoryData.labels[index];
+                    ratingData[rating] += value;
+                    totalResponses += value;
+                });
+            });
+
+            // Create the chart
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(ratingData),
+                    datasets: [{
+                        data: Object.values(ratingData),
+                        backgroundColor: Object.keys(ratingData).map(rating => ratingColors[rating].background),
+                        borderColor: Object.keys(ratingData).map(rating => ratingColors[rating].border),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${title} (Total: ${totalResponses} responses)`,
+                            font: {
+                                size: 14
+                            }
+                        },
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const percentage = Math.round((value / totalResponses) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update responses table
+        function updateResponsesTable(surveys) {
+            const tbody = document.getElementById('responsesTableBody');
+            tbody.innerHTML = '';
+
+            // Create a map to track respondent numbers for each agency
+            const agencyRespondentMap = new Map();
+            let respondentCounter = 1;
+
+            surveys.forEach(survey => {
+                const date = new Date(survey.timestamp).toLocaleDateString();
+                let agency = survey.data.agencyName;
+                
+                // If agency name is not provided or empty, assign "Respondent X"
+                if (!agency || agency.trim() === '') {
+                    agency = `Respondent ${respondentCounter++}`;
+                } else {
+                    // If agency exists, increment its respondent counter
+                    if (!agencyRespondentMap.has(agency)) {
+                        agencyRespondentMap.set(agency, 1);
+                    } else {
+                        agencyRespondentMap.set(agency, agencyRespondentMap.get(agency) + 1);
+                    }
+                    agency = `${agency} (${agencyRespondentMap.get(agency)})`;
+                }
+
+                const role = survey.data.role || 'N/A';
+                const method = survey.data.method || 'N/A';
+                
+                // Calculate average satisfaction
+                const scores = Object.entries(survey.data)
+                    .filter(([key, value]) => key.startsWith('staff_') || key.startsWith('man_'))
+                    .map(([_, value]) => parseInt(value) || 0);
+                const avgSatisfaction = scores.length ? 
+                    ((scores.reduce((a, b) => a + b, 0) / scores.length) / 4 * 100).toFixed(1) + '%' : 'N/A';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td>${agency}</td>
+                    <td>${role}</td>
+                    <td>${method}</td>
+                    <td>${avgSatisfaction}</td>
+                    <td>
+                        <button class="btn-primary" onclick="viewDetails('${survey.id}')">View</button>
+                        <button class="btn-danger" onclick="deleteResponse('${survey.id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            const roleFilter = document.getElementById('roleFilter').value;
+
+            let surveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+
+            // Apply date filter
+            if (dateFilter !== 'all') {
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+                surveys = surveys.filter(survey => {
+                    const surveyDate = new Date(survey.timestamp);
+                    switch (dateFilter) {
+                        case 'today':
+                            return surveyDate >= today;
+                        case 'week':
+                            return surveyDate >= weekAgo;
+                        case 'month':
+                            return surveyDate >= monthAgo;
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            // Apply role filter
+            if (roleFilter !== 'all') {
+                surveys = surveys.filter(survey => survey.data.role === roleFilter);
+            }
+
+            // Update statistics with filtered data
+            updateStatistics(surveys);
+
+            // Update charts with filtered data
+            updateCharts(surveys);
+
+            // Update responses table with filtered data
+            updateResponsesTable(surveys);
+
+            // Update the role filter label to show the current selection
+            const roleFilterLabel = document.querySelector('label[for="roleFilter"]');
+            if (roleFilterLabel) {
+                roleFilterLabel.textContent = `Role: ${roleFilter === 'all' ? 'All Roles' : 
+                    roleFilter === 'staff' ? 'Staff Only' : 'Managers Only'}`;
+            }
+
+            // Update the total responses count in the header of each chart
+            document.querySelectorAll('.chart-container h3').forEach(header => {
+                const currentText = header.textContent;
+                const baseTitle = currentText.split(' (')[0];
+                header.textContent = `${baseTitle} (${surveys.length} responses)`;
+            });
+        }
+
+        // View detailed response
+        function viewDetails(surveyId) {
+            const surveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+            const survey = surveys.find(s => s.id === surveyId);
+            if (survey) {
+                // Create a formatted string of all survey data
+                const details = Object.entries(survey.data)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join('\n');
+                alert(`Survey Details:\n\n${details}`);
+            }
+        }
+
+        // Add error handling for localStorage
+        function getStoredData() {
+            try {
+                return JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+            } catch (error) {
+                console.error('Error accessing localStorage:', error);
+                return [];
+            }
+        }
+
+        function setStoredData(data) {
+            try {
+                localStorage.setItem('surveyResponses', JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error('Error saving to localStorage:', error);
+                return false;
+            }
+        }
+
+        // Update the syncData function to use the new error handling
+        function syncData() {
+            const surveys = getStoredData();
+            updateStatistics(surveys);
+            updateCharts(surveys);
+            updateResponsesTable(surveys);
+        }
+
+        // Update the deleteResponse function
+        function deleteResponse(surveyId) {
+            if (confirm('Are you sure you want to delete this response? This action cannot be undone.')) {
+                const surveys = getStoredData();
+                const updatedSurveys = surveys.filter(s => s.id !== surveyId);
+                
+                if (setStoredData(updatedSurveys)) {
+                    // Real-time update of all components
+                    updateStatistics(updatedSurveys);
+                    updateCharts(updatedSurveys);
+                    updateResponsesTable(updatedSurveys);
+                    
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: var(--success-color);
+                        color: white;
+                        padding: 1rem;
+                        border-radius: 4px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        z-index: 1000;
+                        animation: fadeOut 3s forwards;
+                    `;
+                    successMessage.textContent = 'Response deleted successfully';
+                    document.body.appendChild(successMessage);
+                    
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 3000);
+                } else {
+                    // Show error message
+                    const errorMessage = document.createElement('div');
+                    errorMessage.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: var(--danger-color);
+                        color: white;
+                        padding: 1rem;
+                        border-radius: 4px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        z-index: 1000;
+                        animation: fadeOut 3s forwards;
+                    `;
+                    errorMessage.textContent = 'Error saving changes. Please try again.';
+                    document.body.appendChild(errorMessage);
+                    
+                    setTimeout(() => {
+                        errorMessage.remove();
+                    }, 3000);
+                }
+            }
+        }
+
+        // Add animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; }
+                70% { opacity: 1; }
+                100% { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize dashboard with real-time updates
+        function initializeDashboard() {
+            syncData();
+            // Set up periodic sync (every 5 seconds)
+            setInterval(syncData, 5000);
+        }
+
+        // Initialize dashboard
+        initializeDashboard();
+
+        // Export to Excel
+        function exportToExcel() {
+            const surveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+            if (surveys.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const timestamp = new Date().toLocaleString();
+
+            // Define all survey questions with their full text
+            const surveyQuestions = {
+                demographics: [
+                    { key: 'agencyName', label: 'Agency Name' },
+                    { key: 'years', label: 'Years of Operation' },
+                    { key: 'employees', label: 'Number of Employees' },
+                    { key: 'method', label: 'Operational Method' }
+                ],
+                part2: {
+                    time: [
+                        'Tasks are consistently completed on time and within set deadlines',
+                        'Our agency handles bookings and transactions faster than before',
+                        'I rarely need overtime to finish daily operational tasks',
+                        'The system we use helps me manage my time efficiently',
+                        'I can prioritize tasks more effectively due to our current system'
+                    ],
+                    accuracy: [
+                        'I ensure accurate and complete information by double-checking data entries',
+                        'Our customer records and financial data are mostly error-free',
+                        'The system allows us to easily retrieve past customer or transaction records when needed',
+                        'Mistakes in recording are rare due to the tools we use',
+                        'I trust that our reports reflect accurate information'
+                    ],
+                    errors: [
+                        'I rarely encounter errors like double bookings or lost data',
+                        'Operational mistakes and process-related issues have significantly decreased',
+                        'The current process we use reduces the chance of human error',
+                        'I feel confident that operational errors are handled promptly',
+                        'Our agency tracks and analyzes operational errors to improve future performance'
+                    ],
+                    prod: [
+                        'I can complete more tasks in less time due to improved processes',
+                        'I can handle a higher volume of customer inquiries or tasks due to our improved process',
+                        'I feel more efficient and organized in my daily responsibilities',
+                        'The tools we use help me manage my workload effectively',
+                        'I contribute more value to the agency because of increased productivity'
+                    ]
+                },
+                part3: {
+                    eff: [
+                        'Excel tools help me accomplish tasks faster and with fewer errors compared to manual methods',
+                        'Automation through Excel allows me to focus on more important responsibilities',
+                        'Excel\'s automation features allow our agency to generate reports faster and more consistently',
+                        'Excel-based processes reduce the amount of time spent on repetitive or redundant tasks',
+                        'Since using Excel automation, I feel more productive and less overwhelmed by operational demands'
+                    ],
+                    exacc: [
+                        'Compared to manual systems, Excel automation significantly reduces data entry mistakes',
+                        'Our reports are more reliable since switching to Excel-based systems',
+                        'Excel formulas and functions help minimize human mistakes',
+                        'I can easily validate and cross-check data in Excel',
+                        'Built-in validation tools in Excel help prevent incorrect entries in customer or booking data'
+                    ],
+                    extime: [
+                        'I finish routine tasks faster using Excel tools compared to manual methods',
+                        'Automation through Excel has significantly reduced the time spent on repetitive tasks',
+                        'Scheduling and reporting are more efficient with Excel',
+                        'Time spent on correcting mistakes has decreased due to Excel automation',
+                        'Our overall workflow has improved in terms of time efficiency'
+                    ]
+                },
+                part4: {
+                    staff: [
+                        'Excel automation simplifies my work and reduces daily stress',
+                        'I am satisfied with how Excel helps us manage and monitor client transactions effectively',
+                        'I feel confident using Excel functions to manage operational tasks',
+                        'Excel has helped improve the quality of my work',
+                        'I am satisfied with the support and training I\'ve received for using Excel automation'
+                    ],
+                    man: [
+                        'Excel automation supports agency improvement and aligns with our long-term goals',
+                        'Excel tools help me monitor and evaluate staff performance more efficiently',
+                        'The use of Excel-based automation has led to more informed decision-making',
+                        'I am satisfied with the return on investment (ROI) from using Excel tools in our operations',
+                        'I believe Excel automation enhances our competitiveness in delivering faster, error-free service'
+                    ]
+                },
+                part5: {
+                    int: [
+                        'Learning advanced Excel tools like formulas, macros, and pivot tables would improve our workflow',
+                        'Hands-on workshops could help me use Excel more efficiently for daily tasks',
+                        'We need a standardized Excel template for consistent use across the agency',
+                        'I would benefit from training that focuses on using Excel specifically for travel and tours management tasks',
+                        'I support implementing regular refresher training to maximize Excel\'s capabilities in our agency'
+                    ]
+                }
+            };
+
+            // Create Demographics sheet
+            const demographicsData = [
+                ['Demographics Survey Data'],
+                ['Generated on:', timestamp],
+                ['Total Responses:', surveys.length],
+                [], // Empty row
+                ['Response ID', 'Submission Date', ...surveyQuestions.demographics.map(f => f.label)]
+            ];
+
+            // Add demographics data
+            surveys.forEach(survey => {
+                demographicsData.push([
+                    survey.id,
+                    new Date(survey.timestamp).toLocaleString(),
+                    ...surveyQuestions.demographics.map(f => survey.data[f.key] || 'N/A')
+                ]);
+            });
+
+            // Add summary statistics to demographics
+            addSummaryStats(demographicsData, surveys);
+
+            // Create demographics worksheet
+            const demographicsWS = XLSX.utils.aoa_to_sheet(demographicsData);
+            XLSX.utils.book_append_sheet(wb, demographicsWS, "Demographics");
+
+            // Create detailed responses sheet
+            const responseHeaders = ['Response ID', 'Submission Date', 'Agency Name', 'Role'];
+            const allQuestions = [];
+
+            // Add Part 2 questions
+            Object.entries(surveyQuestions.part2).forEach(([category, questions]) => {
+                questions.forEach((q, i) => {
+                    allQuestions.push({
+                        key: `${category}_${i + 1}`,
+                        label: `Part 2 - ${category.charAt(0).toUpperCase() + category.slice(1)}: ${q}`
+                    });
+                });
+            });
+
+            // Add Part 3 questions
+            Object.entries(surveyQuestions.part3).forEach(([category, questions]) => {
+                questions.forEach((q, i) => {
+                    allQuestions.push({
+                        key: `${category}_${i + 1}`,
+                        label: `Part 3 - ${category.charAt(0).toUpperCase() + category.slice(1)}: ${q}`
+                    });
+                });
+            });
+
+            // Add Part 4 questions
+            Object.entries(surveyQuestions.part4).forEach(([category, questions]) => {
+                questions.forEach((q, i) => {
+                    allQuestions.push({
+                        key: `${category}_${i + 1}`,
+                        label: `Part 4 - ${category.charAt(0).toUpperCase() + category.slice(1)}: ${q}`
+                    });
+                });
+            });
+
+            // Add Part 5 questions
+            Object.entries(surveyQuestions.part5).forEach(([category, questions]) => {
+                questions.forEach((q, i) => {
+                    allQuestions.push({
+                        key: `${category}_${i + 1}`,
+                        label: `Part 5 - ${category.charAt(0).toUpperCase() + category.slice(1)}: ${q}`
+                    });
+                });
+            });
+
+            // Add all question labels to headers
+            responseHeaders.push(...allQuestions.map(q => q.label));
+
+            const surveyData = [
+                ['Detailed Survey Responses'],
+                ['Generated on:', timestamp],
+                ['Total Responses:', surveys.length],
+                [], // Empty row
+                responseHeaders
+            ];
+
+            // Add survey responses data
+            surveys.forEach(survey => {
+                const responseRow = [
+                    survey.id,
+                    new Date(survey.timestamp).toLocaleString(),
+                    survey.data.agencyName || 'N/A',
+                    survey.data.role || 'N/A'
+                ];
+
+                // Add all question responses
+                allQuestions.forEach(q => {
+                    const value = survey.data[q.key] || 'N/A';
+                    responseRow.push(value);
+                });
+
+                surveyData.push(responseRow);
+            });
+
+            // Add summary statistics
+            addSummaryStats(surveyData, surveys);
+
+            // Create survey responses worksheet
+            const surveyWS = XLSX.utils.aoa_to_sheet(surveyData);
+            XLSX.utils.book_append_sheet(wb, surveyWS, "Detailed Responses");
+
+            // Create rating analysis sheets for each method
+            const methods = ['Manual', 'Excel-Based', 'Combination'];
+            methods.forEach(method => {
+                const methodSurveys = surveys.filter(s => s.data.method === method);
+                if (methodSurveys.length > 0) {
+                    const methodData = createMethodRatingAnalysis(method, methodSurveys, surveyQuestions);
+                    const methodWS = XLSX.utils.aoa_to_sheet(methodData);
+                    XLSX.utils.book_append_sheet(wb, methodWS, `${method} Analysis`);
+                }
+            });
+
+            // Create overall rating analysis sheet
+            const overallData = createMethodRatingAnalysis('Overall', surveys, surveyQuestions);
+            const overallWS = XLSX.utils.aoa_to_sheet(overallData);
+            XLSX.utils.book_append_sheet(wb, overallWS, "Overall Analysis");
+
+            // Generate and download Excel file
+            XLSX.writeFile(wb, `survey_data_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        // Helper function to create method-specific rating analysis
+        function createMethodRatingAnalysis(method, surveys, surveyQuestions) {
+            const timestamp = new Date().toLocaleString();
+            const analysisData = [
+                [`${method} Operations Rating Analysis`],
+                ['Generated on:', timestamp],
+                ['Total Responses:', surveys.length],
+                [], // Empty row
+                [
+                    'Part',
+                    'Category',
+                    'Question',
+                    'Strongly Disagree (1)',
+                    'Disagree (2)',
+                    'Agree (3)',
+                    'Strongly Agree (4)',
+                    'Total Responses',
+                    'Average Rating',
+                    'Staff Responses',
+                    'Manager Responses'
+                ]
+            ];
+
+            // Process Part 2 questions
+            Object.entries(surveyQuestions.part2).forEach(([category, questions]) => {
+                questions.forEach((question, i) => {
+                    const key = `${category}_${i + 1}`;
+                    const counts = { '1': 0, '2': 0, '3': 0, '4': 0 };
+                    let staffCount = 0;
+                    let managerCount = 0;
+
+                    surveys.forEach(survey => {
+                        const value = survey.data[key];
+                        if (value >= '1' && value <= '4') {
+                            counts[value]++;
+                            if (survey.data.role === 'staff') staffCount++;
+                            else if (survey.data.role === 'manager') managerCount++;
+                        }
+                    });
+
+                    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+                    const avgRating = total > 0 ? 
+                        (counts['1'] * 1 + counts['2'] * 2 + counts['3'] * 3 + counts['4'] * 4) / total : 0;
+
+                    analysisData.push([
+                        'Part 2 - Operational Efficiency',
+                        category.charAt(0).toUpperCase() + category.slice(1),
+                        question,
+                        counts['1'],
+                        counts['2'],
+                        counts['3'],
+                        counts['4'],
+                        total,
+                        avgRating.toFixed(2),
+                        staffCount,
+                        managerCount
+                    ]);
+                });
+            });
+
+            // Process Part 3 questions
+            Object.entries(surveyQuestions.part3).forEach(([category, questions]) => {
+                questions.forEach((question, i) => {
+                    const key = `${category}_${i + 1}`;
+                    const counts = { '1': 0, '2': 0, '3': 0, '4': 0 };
+                    let staffCount = 0;
+                    let managerCount = 0;
+
+                    surveys.forEach(survey => {
+                        const value = survey.data[key];
+                        if (value >= '1' && value <= '4') {
+                            counts[value]++;
+                            if (survey.data.role === 'staff') staffCount++;
+                            else if (survey.data.role === 'manager') managerCount++;
+                        }
+                    });
+
+                    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+                    const avgRating = total > 0 ? 
+                        (counts['1'] * 1 + counts['2'] * 2 + counts['3'] * 3 + counts['4'] * 4) / total : 0;
+
+                    analysisData.push([
+                        'Part 3 - Excel Automation',
+                        category.charAt(0).toUpperCase() + category.slice(1),
+                        question,
+                        counts['1'],
+                        counts['2'],
+                        counts['3'],
+                        counts['4'],
+                        total,
+                        avgRating.toFixed(2),
+                        staffCount,
+                        managerCount
+                    ]);
+                });
+            });
+
+            // Process Part 4 questions
+            Object.entries(surveyQuestions.part4).forEach(([category, questions]) => {
+                questions.forEach((question, i) => {
+                    const key = `${category}_${i + 1}`;
+                    const counts = { '1': 0, '2': 0, '3': 0, '4': 0 };
+                    let staffCount = 0;
+                    let managerCount = 0;
+
+                    surveys.forEach(survey => {
+                        const value = survey.data[key];
+                        if (value >= '1' && value <= '4') {
+                            counts[value]++;
+                            if (survey.data.role === 'staff') staffCount++;
+                            else if (survey.data.role === 'manager') managerCount++;
+                        }
+                    });
+
+                    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+                    const avgRating = total > 0 ? 
+                        (counts['1'] * 1 + counts['2'] * 2 + counts['3'] * 3 + counts['4'] * 4) / total : 0;
+
+                    analysisData.push([
+                        'Part 4 - Satisfaction',
+                        category.charAt(0).toUpperCase() + category.slice(1),
+                        question,
+                        counts['1'],
+                        counts['2'],
+                        counts['3'],
+                        counts['4'],
+                        total,
+                        avgRating.toFixed(2),
+                        staffCount,
+                        managerCount
+                    ]);
+                });
+            });
+
+            // Process Part 5 questions
+            Object.entries(surveyQuestions.part5).forEach(([category, questions]) => {
+                questions.forEach((question, i) => {
+                    const key = `${category}_${i + 1}`;
+                    const counts = { '1': 0, '2': 0, '3': 0, '4': 0 };
+                    let staffCount = 0;
+                    let managerCount = 0;
+
+                    surveys.forEach(survey => {
+                        const value = survey.data[key];
+                        if (value >= '1' && value <= '4') {
+                            counts[value]++;
+                            if (survey.data.role === 'staff') staffCount++;
+                            else if (survey.data.role === 'manager') managerCount++;
+                        }
+                    });
+
+                    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+                    const avgRating = total > 0 ? 
+                        (counts['1'] * 1 + counts['2'] * 2 + counts['3'] * 3 + counts['4'] * 4) / total : 0;
+
+                    analysisData.push([
+                        'Part 5 - Interventions',
+                        category.charAt(0).toUpperCase() + category.slice(1),
+                        question,
+                        counts['1'],
+                        counts['2'],
+                        counts['3'],
+                        counts['4'],
+                        total,
+                        avgRating.toFixed(2),
+                        staffCount,
+                        managerCount
+                    ]);
+                });
+            });
+
+            // Add method-specific summary statistics
+            analysisData.push([]); // Empty row
+            analysisData.push(['Method-Specific Summary Statistics']);
+            const staffCount = surveys.filter(s => s.data.role === 'staff').length;
+            const managerCount = surveys.filter(s => s.data.role === 'manager').length;
+            const avgSatisfaction = surveys.reduce((acc, survey) => {
+                const scores = Object.entries(survey.data)
+                    .filter(([key, value]) => key.startsWith('staff_') || key.startsWith('man_'))
+                    .map(([_, value]) => parseInt(value) || 0);
+                return acc + (scores.reduce((a, b) => a + b, 0) / scores.length);
+            }, 0) / surveys.length;
+
+            analysisData.push(['Total Responses:', surveys.length]);
+            analysisData.push(['Staff Responses:', staffCount]);
+            analysisData.push(['Manager Responses:', managerCount]);
+            analysisData.push(['Average Satisfaction:', `${((avgSatisfaction / 4) * 100).toFixed(1)}%`]);
+
+            return analysisData;
+        }
+
+        // Helper function to add summary statistics
+        function addSummaryStats(sheetData, surveys) {
+            sheetData.push([]); // Empty row
+            sheetData.push(['Summary Statistics']);
+            const staffCount = surveys.filter(s => s.data.role === 'staff').length;
+            const managerCount = surveys.filter(s => s.data.role === 'manager').length;
+            const manualCount = surveys.filter(s => s.data.method === 'manual').length;
+            const semiAutoCount = surveys.filter(s => s.data.method === 'semi-automated').length;
+            const fullAutoCount = surveys.filter(s => s.data.method === 'fully-automated').length;
+
+            sheetData.push(['Total Responses:', surveys.length]);
+            sheetData.push(['Staff Responses:', staffCount]);
+            sheetData.push(['Manager Responses:', managerCount]);
+            sheetData.push(['Manual Operations:', manualCount]);
+            sheetData.push(['Semi-Automated:', semiAutoCount]);
+            sheetData.push(['Fully Automated:', fullAutoCount]);
+        }
+    </script>
+</body>
+</html> 
