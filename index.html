@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Travel & Tours Agency Survey (Offline)</title>
+
+  <!-- ----------  BASIC STYLES  ---------- -->
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #34495e;
+      --accent-color: #3498db;
+      --border-color: #e0e0e0;
+      --background-color: #f8f9fa;
+      --text-color: #2c3e50;
+      --text-light: #7f8c8d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--background-color);
+      padding: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Mobile-first responsive design */
+    @media (max-width: 768px) {
+      body {
+        padding: 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+        margin: 1.5rem 0 0.75rem;
+      }
+
+      fieldset {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      legend {
+        font-size: 1rem;
+      }
+
+      .question {
+        margin-bottom: 0.75rem;
+        padding: 0.25rem;
+      }
+
+      .scale {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        margin-left: 0;
+      }
+
+      .scale label {
+        flex: 1;
+        min-width: 60px;
+        text-align: center;
+        padding: 0.5rem;
+        margin-right: 0;
+      }
+
+      button {
+        width: 100%;
+        margin: 0.5rem 0;
+        padding: 0.75rem;
+      }
+
+      /* Role selection buttons */
+      #staffBtn, #managerBtn {
+        width: 100%;
+        margin: 0.25rem 0;
+      }
+
+      /* Modal adjustments */
+      .modal-content {
+        width: 95%;
+        margin: 1rem auto;
+        padding: 1rem;
+      }
+
+      .respondent-item {
+        padding: 0.75rem;
+      }
+
+      .respondent-details {
+        padding: 1rem;
+      }
+
+      /* Form buttons container */
+      div[style*="margin-top: 20px"] {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      /* Textarea adjustments */
+      textarea {
+        min-height: 80px;
+      }
+
+      /* Consent section adjustments */
+      fieldset > div {
+        font-size: 0.9rem;
+      }
+
+      /* Demographics section adjustments */
+      label {
+        font-size: 0.9rem;
+      }
+
+      /* Survey title adjustments */
+      p[style*="margin-bottom: 20px"] {
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+    }
+
+    /* Tablet and larger screens */
+    @media (min-width: 769px) {
+      .scale {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .scale label {
+        flex: 1;
+        text-align: center;
+      }
+
+      /* Role selection buttons container */
+      div[style*="display: flex; gap: 10px"] {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      /* Form buttons container */
+      div[style*="margin-top: 20px"] {
+        flex-direction: row;
+        justify-content: center;
+      }
+    }
+
+    /* Dark mode adjustments for mobile */
+    @media (prefers-color-scheme: dark) and (max-width: 768px) {
+      .scale label {
+        background: #2c3e50;
+        color: var(--text-color);
+      }
+
+      .scale label:hover {
+        background-color: var(--accent-color);
+      }
+
+      .modal-content {
+        background: #34495e;
+      }
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 0.5rem;
+    }
+
+    h2 {
+      color: var(--secondary-color);
+      margin: 2rem 0 1rem;
+      font-size: 1.5rem;
+    }
+
+    fieldset {
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    legend {
+      font-weight: 600;
+      color: var(--primary-color);
+      padding: 0 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    label {
+      cursor: pointer;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .question {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+
+    .question:hover {
+      background-color: rgba(52, 152, 219, 0.05);
+    }
+
+    .scale {
+      display: block;
+      margin-top: 0.5rem;
+      margin-left: 1rem;
+    }
+
+    .scale label {
+      display: inline-block;
+      margin-right: 1rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .scale label:hover {
+      background-color: var(--accent-color);
+      color: white;
+      border-color: var(--accent-color);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      resize: vertical;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      margin-right: 1rem;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    /* Modal Styles */
+    #surveysModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+
+    .modal-content {
+      position: relative;
+      background: white;
+      margin: 2rem auto;
+      padding: 2rem;
+      width: 90%;
+      max-width: 1000px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .respondent-item {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .respondent-item:hover {
+      transform: translateX(5px);
+      border-color: var(--accent-color);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .respondent-details {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+      color: var(--primary-color);
+      margin: 1.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .response-item {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+
+    .response-item:hover {
+      background-color: rgba(52, 152, 219, 0.05);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary-color: #ecf0f1;
+        --secondary-color: #bdc3c7;
+        --accent-color: #3498db;
+        --border-color: #34495e;
+        --background-color: #2c3e50;
+        --text-color: #ecf0f1;
+        --text-light: #bdc3c7;
+      }
+
+      fieldset, .respondent-item, .respondent-details {
+        background: #34495e;
+      }
+
+      .scale label {
+        background: #2c3e50;
+        color: var(--text-color);
+      }
+
+      .scale label:hover {
+        background-color: var(--accent-color);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Survey Questionnaire</h1>
+  <p><strong>Study Title:</strong> Optimizing Travel and Tour Agency Operations with Microsoft Excel: A Comparative Analysis of Manual and Automated Processes in Puerto Princesa City</p>
+
+  <!-- ----------  SURVEY FORM  ---------- -->
+  <form id="surveyForm">
+
+    <!-- ----------  CONSENT  ---------- -->
+    <fieldset>
+      <legend>Informed Consent</legend>
+      <div style="margin-bottom: 20px; line-height: 1.6;">
+        <p style="margin: 0 0 1.6em 0;">Dear Respondents,</p>
+        <p style="margin: 0 0 1.6em 0;">Greetings of Peace! The researchers respectfully invite participation in the research study entitled "Optimizing Travel and Tour Agency Operations with Microsoft Excel: A Comparative Analysis of Manual and Automated Processes in Puerto Princesa City" as a partial requirement in Accounting Research Methods. The purpose of this study is to assess and compare the operational efficiency of travel and tour agencies in Puerto Princesa City that use either manual processes or Excel-based automated systems. The goal is to evaluate the impact of Microsoft Excel automation on workflow efficiency, data accuracy, staff productivity, and overall operational performance.</p>
+        <p style="margin: 0 0 1.6em 0;">Respondents are kindly asked to allocate 15-30 minutes to compete a structured questionnaire. By participating in the study, the respondents will be able to explain the evolving communication patterns in which they partake in contemporary society especially in the social media context. This will be done by answering specific self-made questionnaires in. Additionally, all information gathered from this survey including the respondent's identity will be kept anonymize and confidential, and will only be accessed by authorized personnel. This confidentiality and anonymity of data will be employed to the extent allowed by the law, Data Privacy Act of 2012 (R.A. 10173) which aims to protect individuals' personal information. On the other hand, any information obtained from the respondents will be used for academic and research purposes only.</p>
+        <p style="margin: 0 0 1.6em 0;">Participation in this study is completely voluntary. For instance, if there will come a time that respondent will feel uncomfortable participating in the survey, unquestionably they have the right to withdraw without facing any consequences. Your support and Kindness on this endeavour is highly appreciated. Thank you.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <input type="checkbox" id="consent" required>
+        <label for="consent" style="margin: 0;">I agree to participate in this study</label>
+      </div>
+    </fieldset>
+
+    <!-- ----------  DEMOGRAPHICS  ---------- -->
+    <fieldset>
+      <legend>Part I – Demographics Profile</legend>
+
+      <label>Agency Name (optional): 
+        <input type="text" name="agencyName" />
+      </label><br><br>
+
+      <label>Years of Operation:</label><br>
+      <label><input type="radio" name="years" value="Less than 3" required> Less than 3 years</label><br>
+      <label><input type="radio" name="years" value="3 – 5"> 3 – 5 years</label><br>
+      <label><input type="radio" name="years" value="More than 5"> More than 5 years</label><br><br>
+
+      <label>Number of Full-Time Employees:</label><br>
+      <label><input type="radio" name="employees" value="1-5" required> 1 – 5</label><br>
+      <label><input type="radio" name="employees" value="6-10"> 6 – 10</label><br>
+      <label><input type="radio" name="employees" value="More than 10"> More than 10</label><br><br>
+
+      <label>Type of Operational Method:</label><br>
+      <label><input type="radio" name="method" value="Manual" required> Manual (paper/basic computer)</label><br>
+      <label><input type="radio" name="method" value="Excel-Based"> Excel-Based Automation</label><br>
+      <label><input type="radio" name="method" value="Combination"> Combination of Both</label>
+    </fieldset>
+
+    <!-- ----------  PART II – OPERATIONAL EFFICIENCY  ---------- -->
+    <h2>Part II – Level of Operational Efficiency of Agencies</h2>
+
+    <!-- legend note -->
+    <p><em>Legend for all scaled items: 4 – Strongly Agree; 3 – Agree; 2 – Disagree; 1 – Strongly Disagree</em></p>
+
+    <!-- (A) TIME SPENT ON TASK COMPLETION -->
+    <fieldset>
+      <legend>Time Spent on Task Completion</legend>
+      <div class="question">1. Tasks are consistently completed on time and within set deadlines.
+        <span class="scale">
+          <label><input type="radio" name="time_1" value="4" required>4</label>
+          <label><input type="radio" name="time_1" value="3">3</label>
+          <label><input type="radio" name="time_1" value="2">2</label>
+          <label><input type="radio" name="time_1" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">2. Our agency handles bookings and transactions faster than before.
+        <span class="scale">
+          <label><input type="radio" name="time_2" value="4" required>4</label>
+          <label><input type="radio" name="time_2" value="3">3</label>
+          <label><input type="radio" name="time_2" value="2">2</label>
+          <label><input type="radio" name="time_2" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">3. I rarely need overtime to finish daily operational tasks.
+        <span class="scale">
+          <label><input type="radio" name="time_3" value="4" required>4</label>
+          <label><input type="radio" name="time_3" value="3">3</label>
+          <label><input type="radio" name="time_3" value="2">2</label>
+          <label><input type="radio" name="time_3" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">4. The system we use helps me manage my time efficiently.
+        <span class="scale">
+          <label><input type="radio" name="time_4" value="4" required>4</label>
+          <label><input type="radio" name="time_4" value="3">3</label>
+          <label><input type="radio" name="time_4" value="2">2</label>
+          <label><input type="radio" name="time_4" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">5. I can prioritize tasks more effectively due to our current system.
+        <span class="scale">
+          <label><input type="radio" name="time_5" value="4" required>4</label>
+          <label><input type="radio" name="time_5" value="3">3</label>
+          <label><input type="radio" name="time_5" value="2">2</label>
+          <label><input type="radio" name="time_5" value="1">1</label>
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- (B) ACCURACY OF RECORDS -->
+    <fieldset>
+      <legend>Accuracy of Records</legend>
+      <div class="question">1. I ensure accurate and complete information by double-checking data entries.
+        <span class="scale">
+          <label><input type="radio" name="accuracy_1" value="4" required>4</label>
+          <label><input type="radio" name="accuracy_1" value="3">3</label>
+          <label><input type="radio" name="accuracy_1" value="2">2</label>
+          <label><input type="radio" name="accuracy_1" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">2. Our customer records and financial data are mostly error-free.
+        <span class="scale">
+          <label><input type="radio" name="accuracy_2" value="4" required>4</label>
+          <label><input type="radio" name="accuracy_2" value="3">3</label>
+          <label><input type="radio" name="accuracy_2" value="2">2</label>
+          <label><input type="radio" name="accuracy_2" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">3. The system allows us to easily retrieve past customer or transaction records when needed.
+        <span class="scale">
+          <label><input type="radio" name="accuracy_3" value="4" required>4</label>
+          <label><input type="radio" name="accuracy_3" value="3">3</label>
+          <label><input type="radio" name="accuracy_3" value="2">2</label>
+          <label><input type="radio" name="accuracy_3" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">4. Mistakes in recording are rare due to the tools we use.
+        <span class="scale">
+          <label><input type="radio" name="accuracy_4" value="4" required>4</label>
+          <label><input type="radio" name="accuracy_4" value="3">3</label>
+          <label><input type="radio" name="accuracy_4" value="2">2</label>
+          <label><input type="radio" name="accuracy_4" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">5. I trust that our reports reflect accurate information.
+        <span class="scale">
+          <label><input type="radio" name="accuracy_5" value="4" required>4</label>
+          <label><input type="radio" name="accuracy_5" value="3">3</label>
+          <label><input type="radio" name="accuracy_5" value="2">2</label>
+          <label><input type="radio" name="accuracy_5" value="1">1</label>
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- (C) FREQUENCY OF OPERATIONAL ERRORS -->
+    <fieldset>
+      <legend>Frequency of Operational Errors</legend>
+      <div class="question">1. I rarely encounter errors like double bookings or lost data.
+        <span class="scale">
+          <label><input type="radio" name="errors_1" value="4" required>4</label>
+          <label><input type="radio" name="errors_1" value="3">3</label>
+          <label><input type="radio" name="errors_1" value="2">2</label>
+          <label><input type="radio" name="errors_1" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">2. Operational mistakes and process-related issues have significantly decreased.
+        <span class="scale">
+          <label><input type="radio" name="errors_2" value="4" required>4</label>
+          <label><input type="radio" name="errors_2" value="3">3</label>
+          <label><input type="radio" name="errors_2" value="2">2</label>
+          <label><input type="radio" name="errors_2" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">3. The current process we use reduces the chance of human error.
+        <span class="scale">
+          <label><input type="radio" name="errors_3" value="4" required>4</label>
+          <label><input type="radio" name="errors_3" value="3">3</label>
+          <label><input type="radio" name="errors_3" value="2">2</label>
+          <label><input type="radio" name="errors_3" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">4. I feel confident that operational errors are handled promptly.
+        <span class="scale">
+          <label><input type="radio" name="errors_4" value="4" required>4</label>
+          <label><input type="radio" name="errors_4" value="3">3</label>
+          <label><input type="radio" name="errors_4" value="2">2</label>
+          <label><input type="radio" name="errors_4" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">5. Our agency tracks and analyzes operational errors to improve future performance.
+        <span class="scale">
+          <label><input type="radio" name="errors_5" value="4" required>4</label>
+          <label><input type="radio" name="errors_5" value="3">3</label>
+          <label><input type="radio" name="errors_5" value="2">2</label>
+          <label><input type="radio" name="errors_5" value="1">1</label>
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- (D) STAFF PRODUCTIVITY -->
+    <fieldset>
+      <legend>Staff Productivity</legend>
+      <div class="question">1. I can complete more tasks in less time due to improved processes.
+        <span class="scale">
+          <label><input type="radio" name="prod_1" value="4" required>4</label>
+          <label><input type="radio" name="prod_1" value="3">3</label>
+          <label><input type="radio" name="prod_1" value="2">2</label>
+          <label><input type="radio" name="prod_1" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">2. I can handle a higher volume of customer inquiries or tasks due to our improved process.
+        <span class="scale">
+          <label><input type="radio" name="prod_2" value="4" required>4</label>
+          <label><input type="radio" name="prod_2" value="3">3</label>
+          <label><input type="radio" name="prod_2" value="2">2</label>
+          <label><input type="radio" name="prod_2" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">3. I feel more efficient and organized in my daily responsibilities.
+        <span class="scale">
+          <label><input type="radio" name="prod_3" value="4" required>4</label>
+          <label><input type="radio" name="prod_3" value="3">3</label>
+          <label><input type="radio" name="prod_3" value="2">2</label>
+          <label><input type="radio" name="prod_3" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">4. The tools we use help me manage my workload effectively.
+        <span class="scale">
+          <label><input type="radio" name="prod_4" value="4" required>4</label>
+          <label><input type="radio" name="prod_4" value="3">3</label>
+          <label><input type="radio" name="prod_4" value="2">2</label>
+          <label><input type="radio" name="prod_4" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">5. I contribute more value to the agency because of increased productivity.
+        <span class="scale">
+          <label><input type="radio" name="prod_5" value="4" required>4</label>
+          <label><input type="radio" name="prod_5" value="3">3</label>
+          <label><input type="radio" name="prod_5" value="2">2</label>
+          <label><input type="radio" name="prod_5" value="1">1</label>
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- ----------  PART III – EXCEL AUTOMATION IMPROVEMENT  ---------- -->
+    <h2>Part III – Extent of Excel Automation Improvement</h2>
+
+    <!-- (A) WORK EFFICIENCY -->
+    <fieldset>
+      <legend>Work Efficiency</legend>
+      <div class="question">1. Excel tools help me accomplish tasks faster and with fewer errors compared to manual methods.
+        <span class="scale">
+          <label><input type="radio" name="eff_1" value="4" required>4</label>
+          <label><input type="radio" name="eff_1" value="3">3</label>
+          <label><input type="radio" name="eff_1" value="2">2</label>
+          <label><input type="radio" name="eff_1" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">2. Automation through Excel allows me to focus on more important responsibilities.
+        <span class="scale">
+          <label><input type="radio" name="eff_2" value="4" required>4</label>
+          <label><input type="radio" name="eff_2" value="3">3</label>
+          <label><input type="radio" name="eff_2" value="2">2</label>
+          <label><input type="radio" name="eff_2" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">3. Excel's automation features allow our agency to generate reports faster and more consistently.
+        <span class="scale">
+          <label><input type="radio" name="eff_3" value="4" required>4</label>
+          <label><input type="radio" name="eff_3" value="3">3</label>
+          <label><input type="radio" name="eff_3" value="2">2</label>
+          <label><input type="radio" name="eff_3" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">4. Excel-based processes reduce the amount of time spent on repetitive or redundant tasks.
+        <span class="scale">
+          <label><input type="radio" name="eff_4" value="4" required>4</label>
+          <label><input type="radio" name="eff_4" value="3">3</label>
+          <label><input type="radio" name="eff_4" value="2">2</label>
+          <label><input type="radio" name="eff_4" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">5. Since using Excel automation, I feel more productive and less overwhelmed by operational demands.
+        <span class="scale">
+          <label><input type="radio" name="eff_5" value="4" required>4</label>
+          <label><input type="radio" name="eff_5" value="3">3</label>
+          <label><input type="radio" name="eff_5" value="2">2</label>
+          <label><input type="radio" name="eff_5" value="1">1</label>
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- (B) DATA ACCURACY -->
+    <fieldset>
+      <legend>Data Accuracy</legend>
+      <div class="question">1. Compared to manual systems, Excel automation significantly reduces data entry mistakes.
+        <span class="scale">
+          <label><input type="radio" name="exacc_1" value="4" required>4</label>
+          <label><input type="radio" name="exacc_1" value="3">3</label>
+          <label><input type="radio" name="exacc_1" value="2">2</label>
+          <label><input type="radio" name="exacc_1" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">2. Our reports are more reliable since switching to Excel-based systems.
+        <span class="scale">
+          <label><input type="radio" name="exacc_2" value="4" required>4</label>
+          <label><input type="radio" name="exacc_2" value="3">3</label>
+          <label><input type="radio" name="exacc_2" value="2">2</label>
+          <label><input type="radio" name="exacc_2" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">3. Excel formulas and functions help minimize human mistakes.
+        <span class="scale">
+          <label><input type="radio" name="exacc_3" value="4" required>4</label>
+          <label><input type="radio" name="exacc_3" value="3">3</label>
+          <label><input type="radio" name="exacc_3" value="2">2</label>
+          <label><input type="radio" name="exacc_3" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">4. I can easily validate and cross-check data in Excel.
+        <span class="scale">
+          <label><input type="radio" name="exacc_4" value="4" required>4</label>
+          <label><input type="radio" name="exacc_4" value="3">3</label>
+          <label><input type="radio" name="exacc_4" value="2">2</label>
+          <label><input type="radio" name="exacc_4" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">5. Built-in validation tools in Excel help prevent incorrect entries in customer or booking data.
+        <span class="scale">
+          <label><input type="radio" name="exacc_5" value="4" required>4</label>
+          <label><input type="radio" name="exacc_5" value="3">3</label>
+          <label><input type="radio" name="exacc_5" value="2">2</label>
+          <label><input type="radio" name="exacc_5" value="1">1</label>
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- (C) TIME MANAGEMENT -->
+    <fieldset>
+      <legend>Time Management</legend>
+      <div class="question">1. I finish routine tasks faster using Excel tools compared to manual methods.
+        <span class="scale">
+          <label><input type="radio" name="extime_1" value="4" required>4</label>
+          <label><input type="radio" name="extime_1" value="3">3</label>
+          <label><input type="radio" name="extime_1" value="2">2</label>
+          <label><input type="radio" name="extime_1" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">2. Automation through Excel has significantly reduced the time spent on repetitive tasks.
+        <span class="scale">
+          <label><input type="radio" name="extime_2" value="4" required>4</label>
+          <label><input type="radio" name="extime_2" value="3">3</label>
+          <label><input type="radio" name="extime_2" value="2">2</label>
+          <label><input type="radio" name="extime_2" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">3. Scheduling and reporting are more efficient with Excel.
+        <span class="scale">
+          <label><input type="radio" name="extime_3" value="4" required>4</label>
+          <label><input type="radio" name="extime_3" value="3">3</label>
+          <label><input type="radio" name="extime_3" value="2">2</label>
+          <label><input type="radio" name="extime_3" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">4. Time spent on correcting mistakes has decreased due to Excel automation.
+        <span class="scale">
+          <label><input type="radio" name="extime_4" value="4" required>4</label>
+          <label><input type="radio" name="extime_4" value="3">3</label>
+          <label><input type="radio" name="extime_4" value="2">2</label>
+          <label><input type="radio" name="extime_4" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">5. Our overall workflow has improved in terms of time efficiency.
+        <span class="scale">
+          <label><input type="radio" name="extime_5" value="4" required>4</label>
+          <label><input type="radio" name="extime_5" value="3">3</label>
+          <label><input type="radio" name="extime_5" value="2">2</label>
+          <label><input type="radio" name="extime_5" value="1">1</label>
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- ----------  PART IV – LEVEL OF SATISFACTION WITH EXCEL  ---------- -->
+    <h2>Part IV – Level of Satisfaction Regarding Excel-Based Automated Process</h2>
+
+    <fieldset>
+      <legend>Part IV</legend>
+      
+      <!-- Role Selection Buttons -->
+      <div style="margin-bottom: 20px;">
+        <p style="margin-bottom: 10px;">Please select your role:</p>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" id="staffBtn" onclick="selectRole('staff')" style="flex: 1; padding: 10px; background-color: var(--accent-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Staff</button>
+          <button type="button" id="managerBtn" onclick="selectRole('manager')" style="flex: 1; padding: 10px; background-color: var(--accent-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Manager</button>
+        </div>
+      </div>
+
+      <!-- Staff Questions -->
+      <div id="staffQuestions" style="display: none;">
+        <div class="question">1. Excel automation simplifies my work and reduces daily stress.
+          <span class="scale">
+            <label><input type="radio" name="staff_1" value="4" required>4</label>
+            <label><input type="radio" name="staff_1" value="3">3</label>
+            <label><input type="radio" name="staff_1" value="2">2</label>
+            <label><input type="radio" name="staff_1" value="1">1</label>
+          </span>
+        </div>
+        <div class="question">2. I am satisfied with how Excel helps us manage and monitor client transactions effectively.
+          <span class="scale">
+            <label><input type="radio" name="staff_2" value="4" required>4</label>
+            <label><input type="radio" name="staff_2" value="3">3</label>
+            <label><input type="radio" name="staff_2" value="2">2</label>
+            <label><input type="radio" name="staff_2" value="1">1</label>
+          </span>
+        </div>
+        <div class="question">3. I feel confident using Excel functions to manage operational tasks.
+          <span class="scale">
+            <label><input type="radio" name="staff_3" value="4" required>4</label>
+            <label><input type="radio" name="staff_3" value="3">3</label>
+            <label><input type="radio" name="staff_3" value="2">2</label>
+            <label><input type="radio" name="staff_3" value="1">1</label>
+          </span>
+        </div>
+        <div class="question">4. Excel has helped improve the quality of my work.
+          <span class="scale">
+            <label><input type="radio" name="staff_4" value="4" required>4</label>
+            <label><input type="radio" name="staff_4" value="3">3</label>
+            <label><input type="radio" name="staff_4" value="2">2</label>
+            <label><input type="radio" name="staff_4" value="1">1</label>
+          </span>
+        </div>
+        <div class="question">5. I am satisfied with the support and training I've received for using Excel automation.
+          <span class="scale">
+            <label><input type="radio" name="staff_5" value="4" required>4</label>
+            <label><input type="radio" name="staff_5" value="3">3</label>
+            <label><input type="radio" name="staff_5" value="2">2</label>
+            <label><input type="radio" name="staff_5" value="1">1</label>
+          </span>
+        </div>
+      </div>
+
+      <!-- Manager Questions -->
+      <div id="managerQuestions" style="display: none;">
+        <div class="question">1. Excel automation supports agency improvement and aligns with our long-term goals.
+          <span class="scale">
+            <label><input type="radio" name="man_1" value="4" required>4</label>
+            <label><input type="radio" name="man_1" value="3">3</label>
+            <label><input type="radio" name="man_1" value="2">2</label>
+            <label><input type="radio" name="man_1" value="1">1</label>
+          </span>
+        </div>
+        <div class="question">2. Excel tools help me monitor and evaluate staff performance more efficiently.
+          <span class="scale">
+            <label><input type="radio" name="man_2" value="4" required>4</label>
+            <label><input type="radio" name="man_2" value="3">3</label>
+            <label><input type="radio" name="man_2" value="2">2</label>
+            <label><input type="radio" name="man_2" value="1">1</label>
+          </span>
+        </div>
+        <div class="question">3. The use of Excel-based automation has led to more informed decision-making.
+          <span class="scale">
+            <label><input type="radio" name="man_3" value="4" required>4</label>
+            <label><input type="radio" name="man_3" value="3">3</label>
+            <label><input type="radio" name="man_3" value="2">2</label>
+            <label><input type="radio" name="man_3" value="1">1</label>
+          </span>
+        </div>
+        <div class="question">4. I am satisfied with the return on investment (ROI) from using Excel tools in our operations.
+          <span class="scale">
+            <label><input type="radio" name="man_4" value="4" required>4</label>
+            <label><input type="radio" name="man_4" value="3">3</label>
+            <label><input type="radio" name="man_4" value="2">2</label>
+            <label><input type="radio" name="man_4" value="1">1</label>
+          </span>
+        </div>
+        <div class="question">5. I believe Excel automation enhances our competitiveness in delivering faster, error-free service.
+          <span class="scale">
+            <label><input type="radio" name="man_5" value="4" required>4</label>
+            <label><input type="radio" name="man_5" value="3">3</label>
+            <label><input type="radio" name="man_5" value="2">2</label>
+            <label><input type="radio" name="man_5" value="1">1</label>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- ----------  PART V – INTERVENTIONS  ---------- -->
+    <h2>Part V – Interventions to Assist in Optimizing Microsoft Excel</h2>
+
+    <fieldset>
+      <legend>Intervention</legend>
+      <div class="question">1. Learning advanced Excel tools like formulas, macros, and pivot tables would improve our workflow.
+        <span class="scale">
+          <label><input type="radio" name="int_1" value="4" required>4</label>
+          <label><input type="radio" name="int_1" value="3">3</label>
+          <label><input type="radio" name="int_1" value="2">2</label>
+          <label><input type="radio" name="int_1" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">2. Hands-on workshops could help me use Excel more efficiently for daily tasks.
+        <span class="scale">
+          <label><input type="radio" name="int_2" value="4" required>4</label>
+          <label><input type="radio" name="int_2" value="3">3</label>
+          <label><input type="radio" name="int_2" value="2">2</label>
+          <label><input type="radio" name="int_2" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">3. We need a standardized Excel template for consistent use across the agency.
+        <span class="scale">
+          <label><input type="radio" name="int_3" value="4" required>4</label>
+          <label><input type="radio" name="int_3" value="3">3</label>
+          <label><input type="radio" name="int_3" value="2">2</label>
+          <label><input type="radio" name="int_3" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">4. I would benefit from training that focuses on using Excel specifically for travel and tours management tasks.
+        <span class="scale">
+          <label><input type="radio" name="int_4" value="4" required>4</label>
+          <label><input type="radio" name="int_4" value="3">3</label>
+          <label><input type="radio" name="int_4" value="2">2</label>
+          <label><input type="radio" name="int_4" value="1">1</label>
+        </span>
+      </div>
+      <div class="question">5. I support implementing regular refresher training to maximize Excel's capabilities in our agency.
+        <span class="scale">
+          <label><input type="radio" name="int_5" value="4" required>4</label>
+          <label><input type="radio" name="int_5" value="3">3</label>
+          <label><input type="radio" name="int_5" value="2">2</label>
+          <label><input type="radio" name="int_5" value="1">1</label>
+        </span>
+      </div>
+    </fieldset>
+
+    <!-- ----------  COMMENTS  ---------- -->
+    <fieldset>
+      <legend>Additional Comments (Optional)</legend>
+      <textarea name="comments" placeholder="Your comments here..."></textarea>
+    </fieldset>
+
+   
+    <div style="margin-top: 20px; display: flex; justify-content: center;">
+      <button type="submit">Submit Survey</button>
+    </div>
+  </form>
+
+  <!-- Modal for displaying saved surveys -->
+  <div id="surveysModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: relative; background: white; margin: 50px auto; padding: 20px; width: 80%; max-width: 800px; max-height: 80vh; overflow-y: auto; border-radius: 5px;">
+      <button onclick="closeSurveysModal()" style="position: absolute; right: 10px; top: 10px; background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+      <h2>Saved Surveys</h2>
+      <div id="surveysList"></div>
+    </div>
+  </div>
+
+  <!-- ----------  SHEETJS LIBRARY (BUNDLED)  ---------- -->
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
+  <!-- ----------  EXPORT LOGIC  ---------- -->
+  <script>
+    let serverIp = 'localhost';
+    let isRailway = false;
+    let selectedRole = null;
+
+    // Initialize server connection
+    async function initializeServerConnection() {
+        try {
+            const response = await fetch('/get-ip');
+            const data = await response.json();
+            serverIp = data.ip;
+            isRailway = data.isRailway;
+            
+            // Update server info display
+            const serverInfo = document.getElementById('serverInfo');
+            if (serverInfo) {
+                serverInfo.textContent = isRailway 
+                    ? `Connected to Railway: ${serverIp}`
+                    : `Connected to server: ${serverIp}`;
+                serverInfo.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error getting server IP:', error);
+            const serverInfo = document.getElementById('serverInfo');
+            if (serverInfo) {
+                serverInfo.textContent = 'Error connecting to server. Please ensure the server is running.';
+                serverInfo.style.color = 'red';
+                serverInfo.style.display = 'block';
+            }
+        }
+    }
+
+    // Single fetch override with all functionality
+    const originalFetch = window.fetch;
+    window.fetch = async function(url, options = {}) {
+        try {
+            // If it's a localhost URL, replace with server IP
+            if (typeof url === 'string' && url.startsWith('http://localhost:3000')) {
+                const newUrl = isRailway 
+                    ? url.replace('http://localhost:3000', `https://${serverIp}`)
+                    : url.replace('localhost', serverIp);
+                url = newUrl;
+                console.log('Making request to:', url);
+            }
+            
+            // Add timeout to prevent hanging requests
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await originalFetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            return response;
+        } catch (error) {
+            console.error('Fetch error:', error);
+            if (error.name === 'AbortError') {
+                throw new Error('Request timed out. Please check your connection and try again.');
+            }
+            throw error;
+        }
+    };
+
+    // Initialize server connection when the page loads
+    document.addEventListener('DOMContentLoaded', initializeServerConnection);
+
+    // Function to handle role selection
+    function handleRoleSelection(role) {
+        selectedRole = role;
+        const staffQuestions = document.getElementById('staffQuestions');
+        const managerQuestions = document.getElementById('managerQuestions');
+        const staffBtn = document.getElementById('staffBtn');
+        const managerBtn = document.getElementById('managerBtn');
+        
+        // Reset all radio buttons in both sections
+        const allRadios = document.querySelectorAll('#staffQuestions input[type="radio"], #managerQuestions input[type="radio"]');
+        allRadios.forEach(radio => radio.required = false);
+        
+        // Show/hide appropriate questions
+        if (role === 'staff') {
+            staffQuestions.style.display = 'block';
+            managerQuestions.style.display = 'none';
+            staffBtn.style.backgroundColor = '#2980b9'; // Darker blue for selected
+            managerBtn.style.backgroundColor = 'var(--accent-color)'; // Reset other button
+            // Make staff questions required
+            const staffRadios = document.querySelectorAll('#staffQuestions input[type="radio"]');
+            staffRadios.forEach(radio => radio.required = true);
+        } else if (role === 'manager') {
+            staffQuestions.style.display = 'none';
+            managerQuestions.style.display = 'block';
+            managerBtn.style.backgroundColor = '#2980b9'; // Darker blue for selected
+            staffBtn.style.backgroundColor = 'var(--accent-color)'; // Reset other button
+            // Make manager questions required
+            const managerRadios = document.querySelectorAll('#managerQuestions input[type="radio"]');
+            managerRadios.forEach(radio => radio.required = true);
+        }
+    }
+
+    async function initializeServerIp() {
+        try {
+            console.log('Attempting to get server IP...');
+            const ipResponse = await fetch('http://localhost:3000/get-ip', {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                // Add timeout to prevent long hanging requests
+                signal: AbortSignal.timeout(5000)
+            });
+            
+            if (!ipResponse.ok) {
+                throw new Error(`Server responded with status: ${ipResponse.status}`);
+            }
+            
+            const ipData = await ipResponse.json();
+            if (!ipData.ip) {
+                throw new Error('Server did not return a valid IP address');
+            }
+            
+            serverIp = ipData.ip;
+            console.log('Server IP successfully detected:', serverIp);
+            
+            // Display the server IP on the page for debugging
+            const ipDisplay = document.createElement('div');
+            ipDisplay.style.cssText = `
+                position: fixed;
+                bottom: 10px;
+                right: 10px;
+                background-color: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 12px;
+                z-index: 1000;
+            `;
+            ipDisplay.textContent = `Server: ${serverIp}:3000`;
+            document.body.appendChild(ipDisplay);
+            
+        } catch (error) {
+            console.error('Error getting server IP:', error);
+            // Show error message to user
+            const errorMessage = document.createElement('div');
+            errorMessage.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #f44336;
+                color: white;
+                padding: 15px 30px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                z-index: 1000;
+                text-align: center;
+                max-width: 80%;
+            `;
+            errorMessage.innerHTML = `
+                <strong>Connection Error</strong><br>
+                Cannot connect to the server. Please ensure:<br>
+                1. The server is running<br>
+                2. You are connected to the same network as the server<br>
+                3. The server IP is correct<br><br>
+                Error details: ${error.message}<br>
+                <button onclick="retryConnection()" style="margin-top: 10px; padding: 5px 15px; background: white; color: #f44336; border: none; border-radius: 3px; cursor: pointer;">
+                    Retry Connection
+                </button>
+            `;
+            document.body.appendChild(errorMessage);
+        }
+    }
+
+    // Function to retry connection
+    function retryConnection() {
+        // Remove any existing error messages
+        const existingErrors = document.querySelectorAll('div[style*="background-color: #f44336"]');
+        existingErrors.forEach(error => error.remove());
+        
+        // Remove IP display if it exists
+        const ipDisplay = document.querySelector('div[style*="bottom: 10px"]');
+        if (ipDisplay) ipDisplay.remove();
+        
+        // Retry connection
+        initializeServerIp();
+    }
+
+    // Initialize server IP on page load
+    initializeServerIp();
+
+    function exportToExcel(){
+      try {
+        // Get saved surveys
+        const savedSurveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+        
+        if (savedSurveys.length === 0) {
+          alert('No saved survey data found.');
+          return;
+        }
+
+        // Create a new workbook
+        const wb = XLSX.utils.book_new();
+
+        // Helper function to sanitize data
+        function sanitizeData(data) {
+          return data.map(row => {
+            const sanitizedRow = {};
+            for (const [key, value] of Object.entries(row)) {
+              sanitizedRow[key] = value === null || value === undefined ? '' : 
+                String(value).replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+            }
+            return sanitizedRow;
+          });
+        }
+
+        // Helper function to calculate column width
+        function calculateColumnWidth(data, column) {
+          const maxLength = Math.max(
+            column.length,
+            ...data.map(row => String(row[column] || '').length)
+          );
+          return Math.min(Math.max(maxLength + 2, 10), 50);
+        }
+
+        // Helper function to create a sheet
+        function createSheet(data, sheetName) {
+          try {
+            if (!Array.isArray(data) || data.length === 0) {
+              return; // Skip empty sheets
+            }
+
+            const sanitizedData = sanitizeData(data);
+            const ws = XLSX.utils.json_to_sheet(sanitizedData, {
+              header: Object.keys(sanitizedData[0]),
+              skipHeader: false
+            });
+
+            const columns = Object.keys(sanitizedData[0]);
+            const colWidths = columns.map(col => ({
+              wch: calculateColumnWidth(sanitizedData, col)
+            }));
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+          } catch (err) {
+            console.error(`Error creating sheet ${sheetName}:`, err);
+          }
+        }
+
+        // Create Comments sheet
+        const commentsData = savedSurveys
+          .filter(survey => survey.data.comments && survey.data.comments.trim() !== '')
+          .map((survey, index) => ({
+            'Respondent ID': survey.id,
+            'Agency Name': survey.data.agencyName || `Respondent ${index + 1}`,
+            'Submission Date': new Date(survey.timestamp).toLocaleString(),
+            'Comments': survey.data.comments
+          }));
+
+        if (commentsData.length > 0) {
+          createSheet(commentsData, 'Comments');
+        }
+
+        // Helper function to filter data by method
+        function filterByMethod(data, method) {
+          return data.filter(survey => survey.data.method === method);
+        }
+
+        // Helper function to count ratings
+        function countRatings(data, questionPrefix, questionNumber) {
+          const ratings = { '1': 0, '2': 0, '3': 0, '4': 0 };
+          const totalRespondents = data.length;
+          
+          // Count only the specific question
+          data.forEach(survey => {
+            const value = survey.data[`${questionPrefix}_${questionNumber}`];
+            if(value) ratings[value]++;
+          });
+
+          // Add total respondents count
+          ratings.totalRespondents = totalRespondents;
+          return ratings;
+        }
+
+        // Create method-specific summary sheets
+        const methods = ['Manual', 'Excel-Based', 'Combination'];
+        
+        methods.forEach(method => {
+          const methodData = filterByMethod(savedSurveys, method);
+          if (methodData.length === 0) return; // Skip if no data for this method
+
+          const methodSummary = [];
+          
+          // Part II - Operational Efficiency
+          const part2Questions = [
+            { prefix: 'time', label: 'Time Spent' },
+            { prefix: 'accuracy', label: 'Accuracy' },
+            { prefix: 'errors', label: 'Operational Errors' },
+            { prefix: 'prod', label: 'Staff Productivity' }
+          ];
+
+          part2Questions.forEach(category => {
+            for(let i = 1; i <= 5; i++) {
+              const counts = countRatings(methodData, category.prefix, i);
+              methodSummary.push({
+                'Part': 'Part II - Operational Efficiency',
+                'Category': category.label,
+                'Question': `Q${i}`,
+                'Rating 1 (Strongly Disagree)': counts['1'],
+                'Rating 2 (Disagree)': counts['2'],
+                'Rating 3 (Agree)': counts['3'],
+                'Rating 4 (Strongly Agree)': counts['4'],
+                'Total Respondents': counts.totalRespondents
+              });
+            }
+          });
+
+          // Part III - Excel Automation
+          const part3Questions = [
+            { prefix: 'eff', label: 'Work Efficiency' },
+            { prefix: 'exacc', label: 'Data Accuracy' },
+            { prefix: 'extime', label: 'Time Management' }
+          ];
+
+          part3Questions.forEach(category => {
+            for(let i = 1; i <= 5; i++) {
+              const counts = countRatings(methodData, category.prefix, i);
+              methodSummary.push({
+                'Part': 'Part III - Excel Automation',
+                'Category': category.label,
+                'Question': `Q${i}`,
+                'Rating 1 (Strongly Disagree)': counts['1'],
+                'Rating 2 (Disagree)': counts['2'],
+                'Rating 3 (Agree)': counts['3'],
+                'Rating 4 (Strongly Agree)': counts['4'],
+                'Total Respondents': counts.totalRespondents
+              });
+            }
+          });
+
+          // Part IV - Satisfaction
+          const part4Questions = [
+            { prefix: 'staff', label: 'Staff Satisfaction' },
+            { prefix: 'man', label: 'Manager Satisfaction' }
+          ];
+
+          part4Questions.forEach(category => {
+            for(let i = 1; i <= 5; i++) {
+              const counts = countRatings(methodData, category.prefix, i);
+              methodSummary.push({
+                'Part': 'Part IV - Satisfaction',
+                'Category': category.label,
+                'Question': `Q${i}`,
+                'Rating 1 (Strongly Disagree)': counts['1'],
+                'Rating 2 (Disagree)': counts['2'],
+                'Rating 3 (Agree)': counts['3'],
+                'Rating 4 (Strongly Agree)': counts['4'],
+                'Total Respondents': counts.totalRespondents
+              });
+            }
+          });
+
+          // Part V - Interventions
+          const part5Questions = [
+            { prefix: 'int', label: 'Interventions' }
+          ];
+
+          part5Questions.forEach(category => {
+            for(let i = 1; i <= 5; i++) {
+              const counts = countRatings(methodData, category.prefix, i);
+              methodSummary.push({
+                'Part': 'Part V - Interventions',
+                'Category': category.label,
+                'Question': `Q${i}`,
+                'Rating 1 (Strongly Disagree)': counts['1'],
+                'Rating 2 (Disagree)': counts['2'],
+                'Rating 3 (Agree)': counts['3'],
+                'Rating 4 (Strongly Agree)': counts['4'],
+                'Total Respondents': counts.totalRespondents
+              });
+            }
+          });
+
+          // Create the method-specific summary sheet
+          createSheet(methodSummary, `${method}-Summary`);
+
+          // Create method-specific demographics sheet
+          const methodDemographicsData = [
+            [`${method} Method Demographics Summary`],
+            [''],
+            ['Total Respondents', methodData.length],
+            [''],
+            ['Years of Operation'],
+            ['Less than 3 years', methodData.filter(s => s.data.years === 'Less than 3').length],
+            ['3 – 5 years', methodData.filter(s => s.data.years === '3 – 5').length],
+            ['More than 5 years', methodData.filter(s => s.data.years === 'More than 5').length],
+            [''],
+            ['Number of Employees'],
+            ['1-5 employees', methodData.filter(s => s.data.employees === '1-5').length],
+            ['6-10 employees', methodData.filter(s => s.data.employees === '6-10').length],
+            ['More than 10 employees', methodData.filter(s => s.data.employees === 'More than 10').length],
+            [''],
+            ['Detailed Respondent Information'],
+            [''],
+            ['Respondent ID', 'Agency Name', 'Submission Date', 'Years of Operation', 'Number of Employees']
+          ];
+
+          // Add individual respondent details
+          methodData.forEach((survey, index) => {
+            methodDemographicsData.push([
+              survey.id || '',
+              survey.data.agencyName || `Respondent ${index + 1}`,
+              new Date(survey.timestamp).toLocaleString(),
+              survey.data.years || 'Not answered',
+              survey.data.employees || 'Not answered'
+            ]);
+          });
+
+          // Create worksheet from array
+          const ws = XLSX.utils.aoa_to_sheet(methodDemographicsData);
+
+          // Set column widths
+          ws['!cols'] = [
+            { wch: 30 }, // Agency Name
+            { wch: 25 }, // Submission Date
+            { wch: 20 }, // Years of Operation
+            { wch: 20 }  // Number of Employees
+          ];
+
+          // Add some styling
+          ws['!merges'] = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }, // Title
+            { s: { r: 4, c: 0 }, e: { r: 4, c: 1 } }, // Years of Operation header
+            { s: { r: 9, c: 0 }, e: { r: 9, c: 1 } }, // Number of Employees header
+            { s: { r: 14, c: 0 }, e: { r: 14, c: 4 } } // Detailed Information header
+          ];
+
+          // Add the worksheet to workbook
+          XLSX.utils.book_append_sheet(wb, ws, `${method}-Demographics`);
+        });
+
+        // Generate Excel file
+        const excelBuffer = XLSX.write(wb, { 
+          bookType: 'xlsx', 
+          type: 'array',
+          cellStyles: true
+        });
+        
+        const blob = new Blob([excelBuffer], { 
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        });
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'SurveyResponses_By_Method.xlsx';
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up
+        URL.revokeObjectURL(link.href);
+
+      } catch (error) {
+        console.error('Error exporting to Excel:', error);
+        alert(`Error exporting data: ${error.message}. Please try again.`);
+      }
+    }
+
+    // Function to submit the form
+    async function submitForm(event) {
+        event.preventDefault();
+        
+        // Check if a role is selected
+        if (!selectedRole) {
+            alert('Please select your role (Staff or Manager) before submitting the form.');
+            return;
+        }
+
+        // Show loading state
+        const submitButton = event.target.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
+        
+        try {
+            // Get form data
+            const formData = new FormData(event.target);
+            const data = {};
+            
+            // Convert form data to object
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // Add role and timestamp
+            data.role = selectedRole;
+            data.timestamp = new Date().toISOString();
+
+            // First check if server is reachable
+            try {
+                const serverCheck = await fetch(`http://${serverIp}:3000/get-ip`, { 
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!serverCheck.ok) {
+                    throw new Error('Server is not responding');
+                }
+            } catch (error) {
+                throw new Error('Cannot connect to the server. Please make sure you are connected to the same network as the server.');
+            }
+            
+            // Send data to server using the server IP
+            const response = await fetch(`http://${serverIp}:3000/save-response`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.success) {
+                // Show success message
+                const successMessage = document.createElement('div');
+                successMessage.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 15px 30px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    text-align: center;
+                `;
+                successMessage.textContent = 'Thank you for your response! Your survey has been submitted successfully.';
+                document.body.appendChild(successMessage);
+
+                // Reset form
+                event.target.reset();
+                selectedRole = null;
+                document.getElementById('staffBtn').style.backgroundColor = 'var(--accent-color)';
+                document.getElementById('managerBtn').style.backgroundColor = 'var(--accent-color)';
+                document.getElementById('staffQuestions').style.display = 'none';
+                document.getElementById('managerQuestions').style.display = 'none';
+
+                // Remove success message after 5 seconds
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 5000);
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                throw new Error(result.message || 'Failed to save response');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            
+            // Show error message
+            const errorMessage = document.createElement('div');
+            errorMessage.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #f44336;
+                color: white;
+                padding: 15px 30px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                z-index: 1000;
+                text-align: center;
+                max-width: 80%;
+            `;
+            errorMessage.textContent = `Error: ${error.message}. Please try again or contact support if the problem persists.`;
+            document.body.appendChild(errorMessage);
+
+            // Remove error message after 5 seconds
+            setTimeout(() => {
+                errorMessage.remove();
+            }, 5000);
+        } finally {
+            // Reset button state
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+        }
+    }
+    
+    // Add form submit event listener
+    document.getElementById('surveyForm').addEventListener('submit', submitForm);
+
+    function viewSavedSurveys() {
+      window.location.href = 'saved-surveys.html';
+    }
+
+    function deleteRespondent(surveyId) {
+      if (confirm('Are you sure you want to delete this respondent\'s data? This action cannot be undone and will remove their data from both the view and Excel export.')) {
+        try {
+          // Get current saved surveys
+          const savedSurveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+          
+          // Filter out the survey to delete
+          const updatedSurveys = savedSurveys.filter(survey => survey.id !== surveyId);
+          
+          // Update localStorage
+          localStorage.setItem('surveyResponses', JSON.stringify(updatedSurveys));
+          
+          // Update the view
+          viewSavedSurveys();
+          
+          // Show success message with remaining count
+          const remainingCount = updatedSurveys.length;
+          alert(`Respondent data deleted successfully.\n\nRemaining respondents: ${remainingCount}`);
+      } catch (error) {
+          console.error('Error deleting respondent:', error);
+          alert('Error deleting respondent data. Please try again.');
+        }
+      }
+    }
+
+    function showRespondentList() {
+      document.getElementById('respondentList').style.display = 'block';
+      document.getElementById('respondentDetails').style.display = 'none';
+    }
+
+    function showRespondentDetails(surveyId) {
+      const survey = window.allSurveyData.find(s => s.id === surveyId);
+      if (!survey) return;
+
+      const date = new Date(survey.timestamp).toLocaleString();
+      const agencyName = survey.data.agencyName || `Respondent ${window.allSurveyData.length - window.allSurveyData.findIndex(s => s.id === surveyId)}`;
+      
+      // Organize responses by survey parts
+      const part1Responses = [
+        { label: 'Agency Name', value: survey.data.agencyName || 'Not provided' },
+        { label: 'Years of Operation', value: survey.data.years || 'Not answered' },
+        { label: 'Number of Employees', value: survey.data.employees || 'Not answered' },
+        { label: 'Operational Method', value: survey.data.method || 'Not answered' }
+      ];
+
+      const part2Responses = [];
+      for(let i = 1; i <= 5; i++) {
+        const timeQ = survey.data[`time_${i}`];
+        const accuracyQ = survey.data[`accuracy_${i}`];
+        const errorsQ = survey.data[`errors_${i}`];
+        const prodQ = survey.data[`prod_${i}`];
+        
+        if(timeQ) part2Responses.push({ label: `Time Spent Q${i}`, value: timeQ });
+        if(accuracyQ) part2Responses.push({ label: `Accuracy Q${i}`, value: accuracyQ });
+        if(errorsQ) part2Responses.push({ label: `Operational Errors Q${i}`, value: errorsQ });
+        if(prodQ) part2Responses.push({ label: `Staff Productivity Q${i}`, value: prodQ });
+      }
+
+      const part3Responses = [];
+      for(let i = 1; i <= 5; i++) {
+        const effQ = survey.data[`eff_${i}`];
+        const exaccQ = survey.data[`exacc_${i}`];
+        const extimeQ = survey.data[`extime_${i}`];
+        
+        if(effQ) part3Responses.push({ label: `Work Efficiency Q${i}`, value: effQ });
+        if(exaccQ) part3Responses.push({ label: `Data Accuracy Q${i}`, value: exaccQ });
+        if(extimeQ) part3Responses.push({ label: `Time Management Q${i}`, value: extimeQ });
+      }
+
+      const part4Responses = [];
+      for(let i = 1; i <= 5; i++) {
+        const staffQ = survey.data[`staff_${i}`];
+        const manQ = survey.data[`man_${i}`];
+        
+        if(staffQ) part4Responses.push({ label: `Staff Satisfaction Q${i}`, value: staffQ });
+        if(manQ) part4Responses.push({ label: `Manager Satisfaction Q${i}`, value: manQ });
+      }
+
+      const part5Responses = [];
+      for(let i = 1; i <= 5; i++) {
+        const intQ = survey.data[`int_${i}`];
+        
+        if(intQ) part5Responses.push({ label: `Interventions Q${i}`, value: intQ });
+      }
+    }
+  </script>
+</body>
+</html>

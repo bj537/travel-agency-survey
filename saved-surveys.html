@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Saved Survey Responses</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #34495e;
+      --accent-color: #3498db;
+      --border-color: #e0e0e0;
+      --background-color: #f8f9fa;
+      --text-color: #2c3e50;
+      --text-light: #7f8c8d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--background-color);
+      padding: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .respondent-item {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .respondent-item:hover {
+      transform: translateX(5px);
+      border-color: var(--accent-color);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .respondent-details {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+      color: var(--primary-color);
+      margin: 1.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .response-item {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+
+    .response-item:hover {
+      background-color: rgba(52, 152, 219, 0.05);
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      margin-right: 1rem;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .back-button {
+      background-color: var(--accent-color);
+    }
+
+    .back-button:hover {
+      background-color: #2980b9;
+    }
+
+    .chart-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 8px;
+      width: 100%;
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      color: white;
+    }
+
+    .chart-container canvas {
+      max-width: 100%;
+      height: auto !important;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 1rem 0;
+      color: white;
+    }
+
+    .summary-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+      color: white;
+    }
+
+    .summary-section h3 {
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    /* Mobile-first responsive design */
+    @media (max-width: 768px) {
+      body {
+        padding: 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .header div {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+      }
+
+      button {
+        width: 100%;
+        margin: 0.25rem 0;
+        padding: 0.75rem;
+      }
+
+      .respondent-item {
+        padding: 0.75rem;
+      }
+
+      .respondent-item > div {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .respondent-item button {
+        margin: 0.5rem 0 0 0;
+      }
+
+      .respondent-details {
+        padding: 1rem;
+      }
+
+      .summary-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .chart-container {
+        height: 250px;
+        padding: 0.75rem;
+      }
+
+      .chart-container canvas {
+        max-height: 180px;
+        max-width: 90%;
+      }
+    }
+
+    /* Tablet and larger screens */
+    @media (min-width: 769px) {
+      .header {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .header div {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+      }
+
+      .chart-container {
+        min-height: 300px;
+      }
+
+      .chart-container canvas {
+        max-height: 250px;
+        max-width: 80%;
+      }
+    }
+
+    /* Large screens */
+    @media (min-width: 1200px) {
+      .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .chart-container {
+        min-height: 350px;
+      }
+
+      .chart-container canvas {
+        max-height: 300px;
+        max-width: 70%;
+      }
+    }
+
+    /* Dark mode adjustments */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary-color: #ecf0f1;
+        --secondary-color: #bdc3c7;
+        --accent-color: #3498db;
+        --border-color: #34495e;
+        --background-color: #2c3e50;
+        --text-color: #ecf0f1;
+        --text-light: #bdc3c7;
+      }
+
+      .respondent-item, .respondent-details {
+        background: #34495e;
+      }
+
+      .summary-section {
+        background: #34495e;
+      }
+
+      .chart-container {
+        background: rgba(255, 255, 255, 0.05);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Saved Survey Responses</h1>
+    <div>
+      <button class="back-button" onclick="window.location.href='index.html'">Back to Survey</button>
+      <button onclick="showSummary()" style="margin-left: 10px;">View Summary</button>
+    </div>
+  </div>
+
+  <div id="surveysList"></div>
+  <div id="summaryView" style="display: none;">
+    <button onclick="showRespondentList()" style="margin-bottom: 1.5rem;">
+      ← Back to List
+    </button>
+    <div class="summary-section">
+      <h3>Survey Summary</h3>
+      <div class="charts-grid" id="chartsContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    let allSurveyData = [];
+
+    function viewSavedSurveys() {
+      const savedSurveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+      const surveysList = document.getElementById('surveysList');
+      
+      if (savedSurveys.length === 0) {
+        surveysList.innerHTML = '<p>No saved surveys found.</p>';
+      } else {
+        // Create respondent list
+        const respondentList = savedSurveys.map((survey, index) => {
+          const agencyName = survey.data.agencyName || `Respondent ${savedSurveys.length - index}`;
+          const date = new Date(survey.timestamp).toLocaleString();
+          return `
+            <div class="respondent-item">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div onclick="showRespondentDetails('${survey.id}')" style="flex-grow: 1; cursor: pointer;">
+                  <strong>${agencyName}</strong>
+                  <span style="float: right; color: var(--text-light);">${date}</span>
+                </div>
+                <button onclick="deleteRespondent('${survey.id}')" style="margin-left: 10px; background-color: #e74c3c;">
+                  Delete
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        allSurveyData = savedSurveys;
+
+        surveysList.innerHTML = `
+          <div>
+            <div id="respondentList">
+              <h3 style="margin-bottom: 1.5rem;">Respondents (${savedSurveys.length})</h3>
+              ${respondentList}
+            </div>
+            <div id="respondentDetails" style="display: none;">
+              <button onclick="showRespondentList()" style="margin-bottom: 1.5rem;">
+                ← Back to List
+              </button>
+              <div id="selectedRespondentContent"></div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function deleteRespondent(surveyId) {
+      if (confirm('Are you sure you want to delete this respondent\'s data? This action cannot be undone and will remove their data from both the view and Excel export.')) {
+        try {
+          // Get current saved surveys
+          const savedSurveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+          
+          // Filter out the survey to delete
+          const updatedSurveys = savedSurveys.filter(survey => survey.id !== surveyId);
+          
+          // Update localStorage
+          localStorage.setItem('surveyResponses', JSON.stringify(updatedSurveys));
+          
+          // Update the view
+          viewSavedSurveys();
+          
+          // Show success message with remaining count
+          const remainingCount = updatedSurveys.length;
+          alert(`Respondent data deleted successfully.\n\nRemaining respondents: ${remainingCount}`);
+        } catch (error) {
+          console.error('Error deleting respondent:', error);
+          alert('Error deleting respondent data. Please try again.');
+        }
+      }
+    }
+
+    function showRespondentList() {
+      document.getElementById('respondentList').style.display = 'block';
+      document.getElementById('respondentDetails').style.display = 'none';
+      document.getElementById('summaryView').style.display = 'none';
+      document.getElementById('chartsContainer').innerHTML = ''; // Clear charts
+    }
+
+    function showRespondentDetails(surveyId) {
+      const survey = allSurveyData.find(s => s.id === surveyId);
+      if (!survey) return;
+
+      const date = new Date(survey.timestamp).toLocaleString();
+      const agencyName = survey.data.agencyName || `Respondent ${allSurveyData.length - allSurveyData.findIndex(s => s.id === surveyId)}`;
+      
+      // Determine role based on answered questions
+      const isStaff = survey.data.staff_1 || survey.data.staff_2 || survey.data.staff_3 || survey.data.staff_4 || survey.data.staff_5;
+      const isManager = survey.data.man_1 || survey.data.man_2 || survey.data.man_3 || survey.data.man_4 || survey.data.man_5;
+      const role = isStaff ? 'Staff' : isManager ? 'Manager' : 'Not specified';
+      
+      // Organize responses by survey parts
+      const part1Responses = [
+        { label: 'Agency Name', value: survey.data.agencyName || 'Not provided' },
+        { label: 'Years of Operation', value: survey.data.years || 'Not answered' },
+        { label: 'Number of Employees', value: survey.data.employees || 'Not answered' },
+        { label: 'Operational Method', value: survey.data.method || 'Not answered' },
+        { label: 'Role', value: role }
+      ];
+
+      const part2Responses = [];
+      for(let i = 1; i <= 5; i++) {
+        const timeQ = survey.data[`time_${i}`];
+        const accuracyQ = survey.data[`accuracy_${i}`];
+        const errorsQ = survey.data[`errors_${i}`];
+        const prodQ = survey.data[`prod_${i}`];
+        
+        if(timeQ) part2Responses.push({ label: `Time Spent Q${i}`, value: timeQ });
+        if(accuracyQ) part2Responses.push({ label: `Accuracy Q${i}`, value: accuracyQ });
+        if(errorsQ) part2Responses.push({ label: `Operational Errors Q${i}`, value: errorsQ });
+        if(prodQ) part2Responses.push({ label: `Staff Productivity Q${i}`, value: prodQ });
+      }
+
+      const part3Responses = [];
+      for(let i = 1; i <= 5; i++) {
+        const effQ = survey.data[`eff_${i}`];
+        const exaccQ = survey.data[`exacc_${i}`];
+        const extimeQ = survey.data[`extime_${i}`];
+        
+        if(effQ) part3Responses.push({ label: `Work Efficiency Q${i}`, value: effQ });
+        if(exaccQ) part3Responses.push({ label: `Data Accuracy Q${i}`, value: exaccQ });
+        if(extimeQ) part3Responses.push({ label: `Time Management Q${i}`, value: extimeQ });
+      }
+
+      const part4Responses = [];
+      if (isStaff) {
+        for(let i = 1; i <= 5; i++) {
+          const staffQ = survey.data[`staff_${i}`];
+          if(staffQ) part4Responses.push({ label: `Staff Satisfaction Q${i}`, value: staffQ });
+        }
+      } else if (isManager) {
+        for(let i = 1; i <= 5; i++) {
+          const manQ = survey.data[`man_${i}`];
+          if(manQ) part4Responses.push({ label: `Manager Satisfaction Q${i}`, value: manQ });
+        }
+      }
+
+      const part5Responses = [];
+      for(let i = 1; i <= 5; i++) {
+        const intQ = survey.data[`int_${i}`];
+        if(intQ) part5Responses.push({ label: `Intervention Q${i}`, value: intQ });
+      }
+      if(survey.data.comments) {
+        part5Responses.push({ label: 'Additional Comments', value: survey.data.comments });
+      }
+
+      const content = `
+        <div class="respondent-details">
+          <h3 style="margin-bottom: 1rem;">${agencyName}</h3>
+          <p style="color: var(--text-light); margin-bottom: 1rem;">Submitted on: ${date}</p>
+          <p style="color: var(--text-light); margin-bottom: 1.5rem;">ID: ${survey.id}</p>
+
+          <div class="section-title">Part I - Demographics</div>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+            <tr>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Field</th>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Response</th>
+            </tr>
+            ${part1Responses.map(r => `
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);"><strong>${r.label}</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.value}</td>
+              </tr>
+            `).join('')}
+          </table>
+
+          <div class="section-title">Part II - Operational Efficiency</div>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+            <tr>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Question</th>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Rating</th>
+            </tr>
+            ${part2Responses.map(r => `
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.label}</td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.value}</td>
+              </tr>
+            `).join('')}
+          </table>
+
+          <div class="section-title">Part III - Excel Automation</div>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+            <tr>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Question</th>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Rating</th>
+            </tr>
+            ${part3Responses.map(r => `
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.label}</td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.value}</td>
+              </tr>
+            `).join('')}
+          </table>
+
+          <div class="section-title">Part IV - Satisfaction (${role})</div>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+            <tr>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Question</th>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Rating</th>
+            </tr>
+            ${part4Responses.map(r => `
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.label}</td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.value}</td>
+              </tr>
+            `).join('')}
+          </table>
+
+          <div class="section-title">Part V - Interventions</div>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+            <tr>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Question</th>
+              <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--border-color);">Rating</th>
+            </tr>
+            ${part5Responses.map(r => `
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.label}</td>
+                <td style="padding: 8px; border-bottom: 1px solid var(--border-color);">${r.value}</td>
+              </tr>
+            `).join('')}
+          </table>
+        </div>
+      `;
+
+      document.getElementById('respondentList').style.display = 'none';
+      document.getElementById('respondentDetails').style.display = 'block';
+      document.getElementById('selectedRespondentContent').innerHTML = content;
+    }
+
+    function showSummary() {
+      const savedSurveys = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+      if (savedSurveys.length === 0) {
+        alert('No survey data available for summary.');
+        return;
+      }
+
+      document.getElementById('surveysList').style.display = 'none';
+      document.getElementById('summaryView').style.display = 'block';
+
+      // Calculate ratings for each part
+      const part2Data = calculatePartRatings(savedSurveys, ['time', 'accuracy', 'errors', 'prod']);
+      const part3Data = calculatePartRatings(savedSurveys, ['eff', 'exacc', 'extime']);
+      const part4Data = calculatePartRatings(savedSurveys, ['staff', 'man']);
+      const part5Data = calculatePartRatings(savedSurveys, ['int']);
+
+      // Create charts
+      createPieChart('part2Chart', 'Part II - Operational Efficiency', part2Data);
+      createPieChart('part3Chart', 'Part III - Excel Automation', part3Data);
+      createPieChart('part4Chart', 'Part IV - Satisfaction', part4Data);
+      createPieChart('part5Chart', 'Part V - Interventions', part5Data);
+    }
+
+    function calculatePartRatings(surveys, prefixes) {
+      const ratings = { '1': 0, '2': 0, '3': 0, '4': 0 };
+      const totalRespondents = surveys.length;
+
+      surveys.forEach(survey => {
+        // For each respondent, count only one rating per part
+        let hasRated = false;
+        prefixes.forEach(prefix => {
+          if (!hasRated) {
+            // Use the first question of each category as representative
+            const value = survey.data[`${prefix}_1`];
+            if (value) {
+              ratings[value]++;
+              hasRated = true;
+            }
+          }
+        });
+      });
+
+      return {
+        labels: ['Strongly Disagree', 'Disagree', 'Agree', 'Strongly Agree'],
+        data: [ratings['1'], ratings['2'], ratings['3'], ratings['4']],
+        total: totalRespondents
+      };
+    }
+
+    function createPieChart(canvasId, title, data) {
+      const canvas = document.createElement('canvas');
+      canvas.id = canvasId;
+      const container = document.createElement('div');
+      container.className = 'chart-container';
+      container.appendChild(canvas);
+      document.getElementById('chartsContainer').appendChild(container);
+
+      new Chart(canvas, {
+        type: 'pie',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            data: data.data,
+            backgroundColor: [
+              '#e74c3c', // Strongly Disagree
+              '#f39c12', // Disagree
+              '#3498db', // Agree
+              '#2ecc71'  // Strongly Agree
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: `${title} (Total: ${data.total} responses)`,
+              font: {
+                size: window.innerWidth < 768 ? 12 : 14,
+                color: 'white'
+              },
+              padding: {
+                top: 10,
+                bottom: 10
+              },
+              position: 'top'
+            },
+            legend: {
+              position: window.innerWidth < 768 ? 'bottom' : 'right',
+              labels: {
+                color: 'white',
+                font: {
+                  size: window.innerWidth < 768 ? 10 : 12
+                },
+                padding: 10,
+                boxWidth: 15
+              },
+              align: 'center'
+            }
+          },
+          layout: {
+            padding: {
+              top: 20,
+              bottom: 20
+            }
+          }
+        }
+      });
+    }
+
+    // Load saved surveys when page loads
+    window.onload = viewSavedSurveys;
+  </script>
+</body>
+</html> 
