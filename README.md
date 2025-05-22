@@ -24,8 +24,8 @@ travel-agency-survey/
 
 ## Pages
 
-1. `public/index.html` - Main survey form
-2. `public/saved-surveys.html` - Survey response viewer and analytics
+- `public/index.html` - Main survey form
+- `public/saved-surveys.html` - Survey response viewer and analytics
 
 ## Technologies Used
 
@@ -44,10 +44,19 @@ travel-agency-survey/
 ## Data Storage
 
 Survey responses are stored in the browser's localStorage. To export data:
+
 1. Navigate to the saved surveys page
 2. Use the browser's developer tools to access localStorage
 3. Export the 'surveyResponses' data
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests! 
+Feel free to submit issues and enhancement requests!
+
+## Live Demo
+
+Visit the live demo at: [https://bj537.github.io/travel-agency-survey/](https://bj537.github.io/travel-agency-survey/)
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE). 
